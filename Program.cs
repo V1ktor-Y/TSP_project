@@ -1,19 +1,35 @@
+using Microsoft.EntityFrameworkCore;
+using tsp.Contexts;
+using tsp.Repositories;
+using tsp.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddScoped<IVFileRepository, VFileRepository>();
+builder.Services.AddScoped<IVFileService, VFileService>();
+DotNetEnv.Env.Load();
+builder.Configuration.AddEnvironmentVariables();
+System.Console.WriteLine(builder.Configuration["ConnectionString"]);
+builder.Services.AddDbContext<FileDbContext>(options =>
+    options.UseSqlServer(builder.Configuration["ConnectionString"]));
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+if (builder.Configuration["ShouldMigrate"] == "true")
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<FileDbContext>();
+        db.Database.Migrate();
+    }
+}
+
 app.UseRouting();
 
 app.UseAuthorization();

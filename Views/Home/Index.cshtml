@@ -3,6 +3,52 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Add File</h1>
+    <p>Attach a file below</a>.</p>
+    <form asp-action="Upload" asp-controller="Home" method="post" enctype="multipart/form-data">
+        <input type="file" name="uploadedFile" />
+        <button type="submit">Upload</button>
+    </form>
+    <br />
+    <div class="mb-4">
+        <form asp-action="Index" method="get" class="row g-3 justify-content-center">
+            <div class="col-auto">
+                <input type="text" name="searchString" class="form-control" placeholder="Search by file name..." />
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a asp-action="Index" class="btn btn-secondary">Clear</a>
+            </div>
+        </form>
+    </div>
+    @model IEnumerable<tsp.Models.VFile>
+
+    <div class="text-center">
+        <hr />
+
+        <h3>Uploaded Files</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Size</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in Model)
+                {
+                    <tr>
+                        <td>@file.FileName</td>
+                        <td>@(file.FileData?.Length ?? 0) bytes</td>
+                        <td>
+                            <a asp-action="Download" asp-route-id="@file.FileId" class="btn btn-success btn-sm">
+                                Download
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

@@ -15,12 +15,22 @@ public class VFileRepository : IVFileRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<VFile>> GetAllAsync() =>
-        await _context.Files.ToListAsync();
+    public async Task DeleteAsync(VFile file)
+    {
+        _context.Files.Remove(file);
+        await _context.SaveChangesAsync();
+    }
 
-    public async Task<VFile> GetAsync(int id) =>
-        (await _context.Files.Where(f => f.FileId == id).ToListAsync()).FirstOrDefault()!;
+    public async Task<IEnumerable<VFile>> GetAllAsync(int accountId) =>
+        await _context.Files
+            .Where(f => f.AccountId == accountId)
+            .ToListAsync();
 
-    public async Task<IEnumerable<VFile?>> GetByNameAsync(string name) =>
-        await _context.Files.Where(f => f.FileName!.Contains(name)).ToListAsync();
+    public async Task<VFile?> GetAsync(int id, int accountId) =>
+        await _context.Files.FirstOrDefaultAsync(f => f.FileId == id && f.AccountId == accountId);
+
+    public async Task<IEnumerable<VFile>> GetByNameAsync(string name, int accountId) =>
+        await _context.Files
+            .Where(f => f.AccountId == accountId && f.FileName!.Contains(name))
+            .ToListAsync();
 }

@@ -21,6 +21,30 @@ namespace tsp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("tsp.Models.Account", b =>
+                {
+                    b.Property<int>("AccountId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AccountId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AccountId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Accounts");
+                });
+
             modelBuilder.Entity("tsp.Models.VFile", b =>
                 {
                     b.Property<int>("FileId")
@@ -28,6 +52,9 @@ namespace tsp.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FileId"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
 
                     b.Property<byte[]>("FileData")
                         .HasColumnType("varbinary(max)");
@@ -37,7 +64,25 @@ namespace tsp.Migrations
 
                     b.HasKey("FileId");
 
+                    b.HasIndex("AccountId");
+
                     b.ToTable("Files");
+                });
+
+            modelBuilder.Entity("tsp.Models.VFile", b =>
+                {
+                    b.HasOne("tsp.Models.Account", "Account")
+                        .WithMany("Files")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("tsp.Models.Account", b =>
+                {
+                    b.Navigation("Files");
                 });
 #pragma warning restore 612, 618
         }

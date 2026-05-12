@@ -4,10 +4,11 @@
 
 <div class="text-center">
     <h1 class="display-4">Add File</h1>
-    <p>Attach a file below</a>.</p>
+    <p>Attach a file below.</p>
     <form asp-action="Upload" asp-controller="Home" method="post" enctype="multipart/form-data">
-        <input type="file" name="uploadedFile" />
-        <button type="submit">Upload</button>
+        <input type="file" name="uploadedFile" class="form-control d-inline-block w-auto"
+               accept=".png,.jpg,.docx,.pdf" />
+        <button type="submit" class="btn btn-primary">Upload</button>
     </form>
     <br />
     <div class="mb-4">
@@ -32,7 +33,7 @@
                 <tr>
                     <th>File Name</th>
                     <th>Size</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,6 +46,9 @@
                             <a asp-action="Download" asp-route-id="@file.FileId" class="btn btn-success btn-sm">
                                 Download
                             </a>
+                            <form asp-action="Delete" asp-route-id="@file.FileId" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
                         </td>
                     </tr>
                 }

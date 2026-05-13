@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using tsp.Contexts;
 using tsp.Models;
@@ -15,11 +16,13 @@ public class AccountController : Controller
 {
     private readonly IConfiguration _configuration;
     private readonly FileDbContext _context;
+    private readonly IWebHostEnvironment _environment;
 
-    public AccountController(IConfiguration configuration, FileDbContext context)
+    public AccountController(IConfiguration configuration, FileDbContext context, IWebHostEnvironment environment)
     {
         _configuration = configuration;
         _context = context;
+        _environment = environment;
     }
 
     [AllowAnonymous]
@@ -91,7 +94,7 @@ public class AccountController : Controller
 
     private void SignIn(Account account)
     {
-        var jwtKey = _configuration["JwtKey"] ?? "please-use-a-long-incoherent-mess-of-characters-in-dot-env-:)";
+        var jwtKey = _configuration["JwtKey"] ?? "development-only-jwt-key-change-before-production-32";
         var jwtIssuer = _configuration["JwtIssuer"] ?? "tsp";
         var jwtAudience = _configuration["JwtAudience"] ?? "tsp";
         var credentials = new SigningCredentials(
@@ -114,7 +117,7 @@ public class AccountController : Controller
             HttpOnly = true,
             IsEssential = true,
             SameSite = SameSiteMode.Strict,
-            Secure = Request.IsHttps,
+            Secure = Request.IsHttps || _environment.IsDevelopment(),
             Expires = DateTimeOffset.UtcNow.AddHours(8)
         });
     }
